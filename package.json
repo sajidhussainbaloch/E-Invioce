@@ -1,0 +1,20 @@
+{
+  "name": "invoice-bank",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev -w @invoice-bank/api",
+    "dev:web": "npm run dev -w @invoice-bank/web",
+    "dev": "node scripts/dev.mjs",
+    "build": "npm run build -w @invoice-bank/api",
+    "typecheck": "npm run typecheck -w @invoice-bank/api"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
