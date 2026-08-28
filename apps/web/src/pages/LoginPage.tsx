@@ -5,7 +5,7 @@ import { firstError } from '../lib/api'
 import { AuthLayout, Field, Notice, SubmitButton, inputClass } from '../components/auth-ui'
 
 export function LoginPage() {
-  const { login } = useAuth()
+  const { login, refresh } = useAuth()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -18,6 +18,7 @@ export function LoginPage() {
     setBusy(true)
     try {
       await login({ email, password })
+      await refresh()
       navigate('/dashboard', { replace: true })
     } catch (err) {
       setError(firstError(err))
@@ -54,7 +55,7 @@ export function LoginPage() {
       </form>
       <p className="mt-4 text-center text-sm text-slate-500">
         No account?{' '}
-        <Link to="/register" className="font-medium text-emerald-600 hover:underline">
+        <Link to="/register" className="font-medium text-emerald-600 hover:underline dark:text-emerald-400">
           Create one
         </Link>
       </p>

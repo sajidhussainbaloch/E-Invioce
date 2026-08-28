@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useAuth } from '../auth/AuthContext'
-import { ApiError, fieldError, firstError } from '../lib/api'
+import { ApiError, apiFetch, fieldError, firstError } from '../lib/api'
 import { AuthLayout, Field, Notice, SubmitButton, inputClass } from '../components/auth-ui'
 
 export function BusinessSetupPage() {
@@ -23,10 +23,8 @@ export function BusinessSetupPage() {
     setIssues(undefined)
     setBusy(true)
     try {
-      await fetch('/api/business', {
+      await apiFetch('/api/business', {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name,
           ntn: ntn || undefined,
@@ -35,12 +33,6 @@ export function BusinessSetupPage() {
           phone: phone || undefined,
           email: email || undefined,
         }),
-      }).then(async (res) => {
-        if (!res.ok) {
-          const shape = (await res.json().catch(() => ({}))) as { message?: string; issues?: Record<string, string[]> }
-          const err = new ApiError(shape.message ?? 'Failed to save business', res.status, shape.issues)
-          throw err
-        }
       })
       await refresh()
       navigate('/dashboard', { replace: true })

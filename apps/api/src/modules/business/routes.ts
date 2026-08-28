@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { businessSchema } from "@invoice-bank/validation";
 import { businessUsers, businesses, settings as settingsTable } from "../../db/schema.js";
+import { sanitizeSettings } from "./sanitize.js";
 import { db } from "../../db/index.js";
 import { requireAuth, requireBusiness } from "../auth/service.js";
 
@@ -70,7 +71,7 @@ export async function businessRoutes(app: FastifyInstance) {
       .from(settingsTable)
       .where(eq(settingsTable.businessId, businessId))
       .limit(1);
-    return { business, settings: settingsRow ?? null };
+    return { business, settings: sanitizeSettings(settingsRow) };
   });
 
   app.patch("/api/business", { preHandler: requireBusiness }, async (request, reply) => {
@@ -102,18 +103,27 @@ export async function businessRoutes(app: FastifyInstance) {
       .from(settingsTable)
       .where(eq(settingsTable.businessId, businessId))
       .limit(1);
-    return { settings: settingsRow };
+    return { settings: sanitizeSettings(settingsRow) };
   });
 
   app.patch("/api/business/settings", { preHandler: requireBusiness }, async (request, reply) => {
     const businessId = request.auth!.businessId!;
     const body = request.body as {
       watermarkEnabled?: boolean;
+      watermarkMode?: unknown;
+      watermarkText?: unknown;
       invoicePrefix?: string;
       fbrEnvironment?: string;
     };
     const patch: Record<string, unknown> = { updatedAt: new Date() };
     if (typeof body.watermarkEnabled === "boolean") patch.watermarkEnabled = body.watermarkEnabled;
+    if (body.watermarkMode === "text" || body.watermarkMode === "logo") {
+      patch.watermarkMode = body.watermarkMode;
+    }
+    if (typeof body.watermarkText === "string") {
+      const text = body.watermarkText.trim().slice(0, 40);
+      patch.watermarkText = text || "DRAFT";
+    }
     if (typeof body.invoicePrefix === "string") patch.invoicePrefix = body.invoicePrefix;
     if (typeof body.fbrEnvironment === "string") patch.fbrEnvironment = body.fbrEnvironment;
     const [settingsRow] = await db
@@ -121,7 +131,7 @@ export async function businessRoutes(app: FastifyInstance) {
       .set(patch)
       .where(eq(settingsTable.businessId, businessId))
       .returning();
-    return { settings: settingsRow };
+    return { settings: sanitizeSettings(settingsRow) };
   });
 
   app.post("/api/business/logo", { preHandler: requireBusiness }, async (request, reply) => {

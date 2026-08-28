@@ -4,12 +4,18 @@ import { RouterProvider } from 'react-router/dom'
 import { AuthProvider, useAuth } from './auth/AuthContext'
 import { AppShell } from './components/AppShell'
 import { BusinessSetupPage } from './pages/BusinessSetupPage'
+import { CustomersPage } from './pages/CustomersPage'
 import { DashboardPage } from './pages/DashboardPage'
+import { FbrPage } from './pages/FbrPage'
+import { InvoiceDetailPage } from './pages/InvoiceDetailPage'
+import { InvoiceFormPage } from './pages/InvoiceFormPage'
+import { InvoicesPage } from './pages/InvoicesPage'
 import { InvoiceScannerPage } from './pages/InvoiceScannerPage'
 import { LoginPage } from './pages/LoginPage'
-import { PlaceholderPage } from './pages/PlaceholderPage'
+import { ProductsPage } from './pages/ProductsPage'
+import { QuickSellPage } from './pages/QuickSellPage'
 import { RegisterPage } from './pages/RegisterPage'
-import { SampleInvoicePage } from './pages/SampleInvoicePage'
+import { ReportsPage } from './pages/ReportsPage'
 import { SettingsPage } from './pages/SettingsPage'
 
 function FullScreen({ children }: { children: ReactNode }) {
@@ -30,6 +36,15 @@ function RequireAuth({ children, business = false }: { children: ReactNode; busi
   return <>{children}</>
 }
 
+function RequireNoBusiness({ children }: { children: ReactNode }) {
+  const { user, hasBusiness, loading } = useAuth()
+
+  if (loading) return <FullScreen>Checking session…</FullScreen>
+  if (!user) return <Navigate to="/login" replace />
+  if (hasBusiness) return <Navigate to="/dashboard" replace />
+  return <>{children}</>
+}
+
 const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
   { path: '/register', element: <RegisterPage /> },
@@ -37,7 +52,9 @@ const router = createBrowserRouter([
     path: '/business-setup',
     element: (
       <RequireAuth>
-        <BusinessSetupPage />
+        <RequireNoBusiness>
+          <BusinessSetupPage />
+        </RequireNoBusiness>
       </RequireAuth>
     ),
   },
@@ -50,13 +67,16 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: 'dashboard', element: <DashboardPage /> },
-      { path: 'invoices', element: <PlaceholderPage title="Invoices" hint="Invoices arrive in Phase 3, along with FBR submission." /> },
-      { path: 'customers', element: <PlaceholderPage title="Customers" hint="Customer management arrives in Phase 3." /> },
-      { path: 'products', element: <PlaceholderPage title="Products" hint="Product catalogue arrives in Phase 3." /> },
-      { path: 'reports', element: <PlaceholderPage title="Reports" hint="Sales reports will be available after invoices exist." /> },
-      { path: 'sample-invoice', element: <SampleInvoicePage /> },
+      { path: 'invoices', element: <InvoicesPage /> },
+      { path: 'quick-sell', element: <QuickSellPage /> },
+      { path: 'invoices/new', element: <InvoiceFormPage /> },
+      { path: 'invoices/:id/edit', element: <InvoiceFormPage /> },
+      { path: 'invoices/:id', element: <InvoiceDetailPage /> },
+      { path: 'customers', element: <CustomersPage /> },
+      { path: 'products', element: <ProductsPage /> },
+      { path: 'reports', element: <ReportsPage /> },
       { path: 'scanner', element: <InvoiceScannerPage /> },
-      { path: 'fbr', element: <PlaceholderPage title="FBR Integration" hint="DI API connectivity is planned for Phase 4: get a Bearer token, sandbox tests, then production filing." /> },
+      { path: 'fbr', element: <FbrPage /> },
       { path: 'settings', element: <SettingsPage /> },
     ],
   },

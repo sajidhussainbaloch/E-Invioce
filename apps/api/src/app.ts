@@ -11,6 +11,11 @@ import { authRoutes } from "./modules/auth/routes.js";
 import { businessRoutes } from "./modules/business/routes.js";
 import { pdfRoutes } from "./modules/pdf/routes.js";
 import { dashboardRoutes } from "./modules/dashboard/routes.js";
+import { customerRoutes } from "./modules/customers/routes.js";
+import { productRoutes } from "./modules/products/routes.js";
+import { invoiceRoutes } from "./modules/invoices/routes.js";
+import { fbrRoutes } from "./modules/fbr/routes.js";
+import { reportsRoutes } from "./modules/reports/routes.js";
 import { resolveSession } from "./modules/auth/service.js";
 
 export async function buildApp(): Promise<FastifyInstance> {
@@ -52,6 +57,11 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(businessRoutes);
   await app.register(pdfRoutes);
   await app.register(dashboardRoutes);
+  await app.register(customerRoutes);
+  await app.register(productRoutes);
+  await app.register(invoiceRoutes);
+  await app.register(fbrRoutes);
+  await app.register(reportsRoutes);
 
   return app;
 }

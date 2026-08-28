@@ -11,6 +11,7 @@ import {
   settings as settingsTable,
   users,
 } from "../../db/schema.js";
+import { sanitizeSettings } from "../business/sanitize.js";
 import { db } from "../../db/index.js";
 import {
   SESSION_COOKIE,
@@ -89,7 +90,7 @@ export async function authRoutes(app: FastifyInstance) {
         .from(settingsTable)
         .where(eq(settingsTable.businessId, auth.business.id))
         .limit(1);
-      business = { ...biz, settings: settingsRow ?? null };
+      business = { ...biz, settings: sanitizeSettings(settingsRow) };
     }
     return { user: publicUser(auth.user), business, hasBusiness: auth.businessId != null };
   });
