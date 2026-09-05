@@ -45,7 +45,9 @@ export function SettingsPage() {
         method: 'PATCH',
         body: JSON.stringify({
           name: p.business?.name,
+          taxpayerType: p.business?.taxpayerType ?? 'individual',
           ntn: p.business?.ntn ?? undefined,
+          salesTaxRegistered: p.business?.salesTaxRegistered ?? false,
           taxRegistration: p.business?.taxRegistration ?? undefined,
           address: p.business?.address ?? undefined,
           phone: p.business?.phone ?? undefined,
@@ -171,24 +173,81 @@ export function SettingsPage() {
                 onChange={(e) => patch((prev) => ({ ...prev, business: { ...prev.business!, name: e.target.value } }))}
               />
             </Field>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="NTN">
-                <input
-                  className={inputClass()}
-                  value={biz.ntn ?? ''}
-                  onChange={(e) => patch((prev) => ({ ...prev, business: { ...prev.business!, ntn: e.target.value } }))}
-                />
-              </Field>
-              <Field label="Tax registration no.">
+            <Field label="Taxpayer type">
+              <div className="flex gap-2">
+                {(
+                  [
+                    { value: 'individual', label: 'Individual' },
+                    { value: 'company', label: 'Company / AOP' },
+                  ] as const
+                ).map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() =>
+                      patch((prev) => ({ ...prev, business: { ...prev.business!, taxpayerType: opt.value } }))
+                    }
+                    className={`rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                      (biz.taxpayerType ?? 'individual') === opt.value
+                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+                        : 'border-slate-300 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </Field>
+            <Field label="FBR Registration / NTN">
+              <input
+                className={inputClass()}
+                value={biz.ntn ?? ''}
+                onChange={(e) => patch((prev) => ({ ...prev, business: { ...prev.business!, ntn: e.target.value } }))}
+                placeholder={
+                  (biz.taxpayerType ?? 'individual') === 'individual' ? '13-digit CNIC (e.g. 35202-1234567-8)' : 'Applicable FBR NTN (e.g. 1234567-8)'
+                }
+              />
+            </Field>
+            <Field label="Sales Tax Registered">
+              <div className="flex gap-2">
+                {(
+                  [
+                    { value: true, label: 'Yes' },
+                    { value: false, label: 'No' },
+                  ] as const
+                ).map((opt) => (
+                  <button
+                    key={String(opt.value)}
+                    type="button"
+                    onClick={() =>
+                      patch((prev) => ({
+                        ...prev,
+                        business: { ...prev.business!, salesTaxRegistered: opt.value },
+                      }))
+                    }
+                    className={`rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                      (biz.salesTaxRegistered ?? false) === opt.value
+                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+                        : 'border-slate-300 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </Field>
+            {(biz.salesTaxRegistered ?? false) && (
+              <Field label="STRN">
                 <input
                   className={inputClass()}
                   value={biz.taxRegistration ?? ''}
                   onChange={(e) =>
                     patch((prev) => ({ ...prev, business: { ...prev.business!, taxRegistration: e.target.value } }))
                   }
+                  placeholder="Sales Tax Registration Number"
                 />
               </Field>
-            </div>
+            )}
             <Field label="Address">
               <input
                 className={inputClass()}
@@ -396,7 +455,7 @@ const InvoicePreview = ({
   logoWatermark: boolean
   ref: RefObject<HTMLDivElement | null>
 }) => {
-  const subtitle = [business?.address ?? '', business?.phone ? `Phone: ${business.phone}` : '', business?.ntn ? `NTN: ${business.ntn}` : '']
+  const subtitle = [business?.address ?? '', business?.phone ? `Phone: ${business.phone}` : '', business?.ntn ? `FBR No: ${business.ntn}` : '']
     .filter(Boolean)
     .join('\n')
 

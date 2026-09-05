@@ -21,7 +21,9 @@ export const users = pgTable("users", {
 export const businesses = pgTable("businesses", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 150 }).notNull(),
+  taxpayerType: varchar("taxpayer_type", { length: 16 }).notNull().default("individual"),
   ntn: varchar("ntn", { length: 20 }),
+  salesTaxRegistered: boolean("sales_tax_registered").notNull().default(false),
   taxRegistration: varchar("tax_registration", { length: 30 }),
   address: varchar("address", { length: 300 }),
   phone: varchar("phone", { length: 30 }),

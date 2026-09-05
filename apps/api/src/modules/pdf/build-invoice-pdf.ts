@@ -71,8 +71,8 @@ export async function buildInvoicePdf(opts: {
       [
         business.address ?? "",
         business.phone ? `Phone: ${business.phone}` : "",
-        business.ntn ? `NTN: ${business.ntn}` : "",
-        business.taxRegistration ? `Tax Reg: ${business.taxRegistration}` : "",
+        business.ntn ? `FBR No: ${business.ntn}` : "",
+        business.salesTaxRegistered && business.taxRegistration ? `STRN: ${business.taxRegistration}` : "",
         business.email ?? "",
       ]
         .filter(Boolean)

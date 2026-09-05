@@ -1,0 +1,2 @@
+ALTER TABLE "businesses" ADD COLUMN "taxpayer_type" varchar(16) DEFAULT 'individual' NOT NULL;--> statement-breakpoint
+ALTER TABLE "businesses" ADD COLUMN "sales_tax_registered" boolean DEFAULT false NOT NULL;

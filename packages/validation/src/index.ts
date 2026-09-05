@@ -18,7 +18,9 @@ export const changePasswordSchema = z.object({
 
 export const businessSchema = z.object({
   name: z.string().trim().min(2, "Business name is too short").max(150),
+  taxpayerType: z.enum(["individual", "company"]).optional().default("individual"),
   ntn: z.string().trim().max(20).optional(),
+  salesTaxRegistered: z.boolean().optional(),
   taxRegistration: z.string().trim().max(30).optional(),
   address: z.string().trim().max(300).optional(),
   phone: z.string().trim().max(30).optional(),

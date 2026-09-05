@@ -8,7 +8,9 @@ export type User = {
 export type Business = {
   id: string
   name: string
+  taxpayerType: 'individual' | 'company'
   ntn: string | null
+  salesTaxRegistered: boolean
   taxRegistration: string | null
   address: string | null
   phone: string | null

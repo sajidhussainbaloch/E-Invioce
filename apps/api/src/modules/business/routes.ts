@@ -46,7 +46,9 @@ export async function businessRoutes(app: FastifyInstance) {
       .insert(businesses)
       .values({
         name: body.name,
+        taxpayerType: body.taxpayerType,
         ntn: body.ntn || null,
+        salesTaxRegistered: body.salesTaxRegistered ?? false,
         taxRegistration: body.taxRegistration || null,
         address: body.address || null,
         phone: body.phone || null,
@@ -81,7 +83,9 @@ export async function businessRoutes(app: FastifyInstance) {
       .update(businesses)
       .set({
         name: body.name,
+        taxpayerType: body.taxpayerType,
         ntn: body.ntn || null,
+        salesTaxRegistered: body.salesTaxRegistered ?? false,
         taxRegistration: body.taxRegistration || null,
         address: body.address || null,
         phone: body.phone || null,

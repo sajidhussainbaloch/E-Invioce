@@ -8,8 +8,10 @@ export function BusinessSetupPage() {
   const { refresh } = useAuth()
   const navigate = useNavigate()
   const [name, setName] = useState('')
+  const [taxpayerType, setTaxpayerType] = useState<'individual' | 'company'>('individual')
   const [ntn, setNtn] = useState('')
-  const [taxRegistration, setTaxRegistration] = useState('')
+  const [salesTaxRegistered, setSalesTaxRegistered] = useState(false)
+  const [strn, setStrn] = useState('')
   const [address, setAddress] = useState('')
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
@@ -27,8 +29,10 @@ export function BusinessSetupPage() {
         method: 'POST',
         body: JSON.stringify({
           name,
+          taxpayerType,
           ntn: ntn || undefined,
-          taxRegistration: taxRegistration || undefined,
+          salesTaxRegistered,
+          taxRegistration: strn || undefined,
           address: address || undefined,
           phone: phone || undefined,
           email: email || undefined,
@@ -45,7 +49,7 @@ export function BusinessSetupPage() {
   }
 
   return (
-    <AuthLayout title="Set up your business" subtitle="This information appears on invoices and FBR filings">
+    <AuthLayout title="Set up your business" subtitle="This information appears on your invoices">
       <form onSubmit={submit} noValidate>
         {error && <Notice kind="error">{error}</Notice>}
         <Field label="Business name" error={fieldError(issues, 'name')}>
@@ -57,24 +61,76 @@ export function BusinessSetupPage() {
             required
           />
         </Field>
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="NTN" error={fieldError(issues, 'ntn')}>
+        <Field label="Taxpayer type">
+          <div className="flex gap-2">
+            {(
+              [
+                { value: 'individual', label: 'Individual' },
+                { value: 'company', label: 'Company / AOP' },
+              ] as const
+            ).map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setTaxpayerType(opt.value)}
+                className={`rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                  taxpayerType === opt.value
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+                    : 'border-slate-300 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </Field>
+        <Field label="FBR Registration / NTN">
+          <input
+            className={inputClass()}
+            value={ntn}
+            onChange={(e) => setNtn(e.target.value)}
+            placeholder={taxpayerType === 'individual' ? '13-digit CNIC (e.g. 35202-1234567-8)' : 'Applicable FBR NTN (e.g. 1234567-8)'}
+          />
+        </Field>
+        {taxpayerType === 'individual' && (
+          <p className="mb-3 text-xs text-slate-400 dark:text-slate-500">
+            For an individual, FBR uses your 13-digit CNIC as the registration number. This is not used to connect you
+            to FBR — digital invoicing runs through FBR's integration process.
+          </p>
+        )}
+        <Field label="Sales Tax Registered">
+          <div className="flex gap-2">
+            {(
+              [
+                { value: true, label: 'Yes' },
+                { value: false, label: 'No' },
+              ] as const
+            ).map((opt) => (
+              <button
+                key={String(opt.value)}
+                type="button"
+                onClick={() => setSalesTaxRegistered(opt.value)}
+                className={`rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                  salesTaxRegistered === opt.value
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+                    : 'border-slate-300 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </Field>
+        {salesTaxRegistered && (
+          <Field label="STRN">
             <input
               className={inputClass()}
-              value={ntn}
-              onChange={(e) => setNtn(e.target.value)}
-              placeholder="1234567-8"
+              value={strn}
+              onChange={(e) => setStrn(e.target.value)}
+              placeholder="Sales Tax Registration Number (e.g. 1800000000000)"
             />
           </Field>
-          <Field label="Tax registration no." error={fieldError(issues, 'taxRegistration')}>
-            <input
-              className={inputClass()}
-              value={taxRegistration}
-              onChange={(e) => setTaxRegistration(e.target.value)}
-              placeholder="Optional"
-            />
-          </Field>
-        </div>
+        )}
         <Field label="Address" error={fieldError(issues, 'address')}>
           <input
             className={inputClass()}

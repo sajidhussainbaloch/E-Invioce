@@ -248,7 +248,7 @@ export function FbrPage() {
           <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Connection status</h2>
           <dl className="space-y-2 text-sm">
             <Row label="Business" value={status?.business.name ?? '—'} />
-            <Row label="Seller NTN" value={status?.business.ntn ?? 'Not set'} ok={!!status?.business.hasNtn} />
+            <Row label="FBR registration (NTN/CNIC)" value={status?.business.ntn ?? 'Not set'} ok={!!status?.business.hasNtn} />
             <Row
               label="Province"
               value={status?.status?.province ?? 'Not set'}
